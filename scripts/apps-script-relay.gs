@@ -74,7 +74,12 @@ function doPost(e) {
       ));
     }
 
-    var options = { name: 'Snitch' };
+    var fromName = String(data.fromName || 'Community Report')
+      .replace(/[\r\n]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 70);
+    var options = { name: fromName || 'Community Report' };
     if (blobs.length) options.attachments = blobs;
     GmailApp.sendEmail(allowed, String(data.subject), String(data.text), options);
     return json_({ ok: true });

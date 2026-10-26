@@ -179,17 +179,19 @@ test('sniffImage accepts the photo types Snitch documents', () => {
 
 test('buildReport uses the HOA cover letter and a dated subject', () => {
   const report = buildReport({
-    note: '',
+    note: 'Light out on Elm',
     photoCount: 2,
     source: 'web',
     fromLabel: '',
     timeZone: 'UTC',
     now: new Date('2026-10-25T15:04:00Z'),
   });
-  assert.equal(report.subject, 'Community Deficiency Report – October 25, 2026');
+  assert.match(report.subject, /^Community Deficiency Report – October 25, 2026, /);
+  assert.match(report.subject, /3:04/);
+  assert.match(report.subject, /Light out on Elm$/);
   assert.match(report.text, /^Dear HOA Management,/);
   assert.match(report.text, /responsibility of the HOA\./);
-  assert.match(report.text, /Resident's note:\n\(no additional note provided\)/);
+  assert.match(report.text, /Resident's note:\nLight out on Elm/);
   assert.match(report.text, /Please see the attached photo\(s\) documenting the issue\./);
   assert.match(report.text, /Thank you\./);
   assert.match(report.text, /via the web form/);
@@ -307,7 +309,8 @@ test('the web form emails a photo and refuses anything else', async (t) => {
   assert.equal(ok.status, 200);
   assert.equal(JSON.parse(ok.body).ok, true);
   assert.equal(sent.length, 1);
-  assert.equal(sent[0].subject, expectSubject_());
+  assert.match(sent[0].subject, /^Community Deficiency Report – /);
+  assert.match(sent[0].subject, /Latch is broken/);
   assert.match(sent[0].text, /Latch is broken/);
   assert.match(sent[0].text, /Please see the attached photo\(s\)/);
   assert.equal(sent[0].attachments[0].filename, '01-gate.jpg');
@@ -433,13 +436,3 @@ test('inbound intake stays off until a secret is set, then accepts a text', asyn
   assert.equal(sent[1].attachments[0].contentType, 'image/heic');
   assert.match(sent[1].text, /via email/);
 });
-
-function expectSubject_() {
-  return buildReport({
-    note: 'x',
-    photoCount: 1,
-    source: 'web',
-    timeZone: 'UTC',
-    now: new Date(),
-  }).subject;
-}

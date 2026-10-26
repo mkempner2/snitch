@@ -9,22 +9,24 @@ Photos are held in memory only long enough to attach them to the email. They are
 Subject:
 
 ```text
-Community Deficiency Report – October 25, 2026
+Community Deficiency Report – October 25, 2026, 3:04 PM – Light out on Elm
 ```
 
-The date uses `REPORT_TIMEZONE`, or UTC if you do not set one.
+The date and time use `REPORT_TIMEZONE`, or UTC if you do not set one. When the resident wrote a note, the subject also includes a short excerpt so each report is distinct. The inbox shows `FROM_NAME` (default `Community Report`) and the Gmail address in `GMAIL_USER`. Set `FROM_NAME` to the community name, for example `East Ridge Community Report`.
 
 Body:
 
 ```text
 Dear HOA Management,
 
-A resident has noticed a deficiency in our community and requests that it be addressed as quickly as possible, as this is the responsibility of the HOA.
+I am writing to inform you that a fellow resident has noticed a deficiency in our community and requests that it be addressed as quickly as possible, as this is the responsibility of the HOA.
 
 Resident's note:
 [the note, or "(no additional note provided)"]
 
 Please see the attached photo(s) documenting the issue.
+
+If you could please respond to this email to acknowledge reception and provide an estimate of when the issue will be resolved, we would greatly appreciate it.
 
 Thank you.
 ```
@@ -135,6 +137,22 @@ A free Gmail account can send to about **500 recipients per rolling 24 hours**. 
 Gmail also rejects a message larger than 25 MB. Photo bytes grow by about a third when they are encoded for email, which is why the upload cap is 15 MB rather than 25.
 
 App passwords and this volume of mail are free. This is a poor fit for newsletters or anything sent to a large list.
+
+## If reports land in spam
+
+Gmail accepted the message. The spam folder is a later decision by the receiving mailbox. A brand-new Gmail address that sends the same kind of report over and over, especially while its first messages had tiny test photos, is easy for that filter to file away. Snitch already sends through Google's own SMTP servers, so this is not a missing SPF or DKIM setting you can turn on for an `@gmail.com` address.
+
+Do this once in the mailbox that receives the reports (`HOA_EMAIL`):
+
+1. Open one of the Snitch messages in Spam.
+2. Click **Report not spam** (Gmail also shows this as **Not spam**).
+3. Add `GMAIL_USER` to Google Contacts. In the message, click the sender, then **Add to Contacts**.
+4. Create a filter so later reports skip spam. In Gmail search, enter `from:your-sending-address@gmail.com`, open the filter menu, and choose **Create filter**. Check **Never send it to Spam**, then create the filter.
+5. Reply once to that message, even with a short "received." A reply is the strongest signal Gmail keeps for that pair of addresses.
+
+After those steps, the next report should arrive in the inbox. Reports sent before the filter was created stay in Spam until you mark them.
+
+If the HOA later uses Microsoft 365 or Google Workspace, an admin can also allowlist the sending address in the mail gateway. That is the same idea: tell the receiving system this sender is expected. A custom domain with its own SPF, DKIM, and DMARC record is worth it only if the HOA outgrows the free Gmail account. It does not replace the steps above for the mailbox you are using now.
 
 ## Deploy
 

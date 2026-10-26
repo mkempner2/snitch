@@ -123,6 +123,8 @@ function loadConfig() {
   const dailySendMax = readInteger('DAILY_SEND_MAX', 100, 1, 500, errors);
   const smtpPort = readInteger('SMTP_PORT', 587, 1, 65535, errors);
 
+  const fromName = cleanHeaderName(process.env.FROM_NAME, 'Community Report');
+
   const trustRaw = process.env.TRUST_PROXY;
   let trustProxy = false;
   if (trustRaw == null || String(trustRaw).trim() === '') {
@@ -138,6 +140,7 @@ function loadConfig() {
       mailMode,
       gmailUser,
       gmailPass,
+      fromName,
       recipients: recipients || [],
       timeZone,
       maxPhotos,
@@ -189,12 +192,28 @@ function sanitizeNote(raw, max) {
   return { text };
 }
 
-function sanitizeFrom(value) {
-  return String(value || '')
+function cleanHeaderName(value, fallback) {
+  const clean = String(value || '')
     .replace(/[\u0000-\u001F\u007F]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
-    .slice(0, 160);
+    .slice(0, 70);
+  return clean || fallback;
+}
+
+function sanitizeFrom(value) {
+  return cleanHeaderName(value, '').slice(0, 160);
+}
+
+function subjectExcerpt(note) {
+  const line = String(note || '')
+    .split('\n')
+    .map((part) => part.trim())
+    .find(Boolean);
+  if (!line || line === '(no additional note provided)') return '';
+  const clean = cleanHeaderName(line, '');
+  if (clean.length <= 60) return clean;
+  return `${clean.slice(0, 57).trimEnd()}…`;
 }
 
 function buildReport({ note, photoCount, source, fromLabel, timeZone, now }) {
@@ -216,12 +235,14 @@ function buildReport({ note, photoCount, source, fromLabel, timeZone, now }) {
   const text = [
     'Dear HOA Management,',
     '',
-    'A resident has noticed a deficiency in our community and requests that it be addressed as quickly as possible, as this is the responsibility of the HOA.',
+    'I am writing to inform you that a fellow resident has noticed a deficiency in our community and requests that it be addressed as quickly as possible, as this is the responsibility of the HOA.',
     '',
     "Resident's note:",
     shown,
     '',
     photoLine,
+    '',
+    'If you could please respond to this email to acknowledge reception and provide an estimate of when the issue will be resolved, we would greatly appreciate it.',
     '',
     'Thank you.',
     '',
@@ -230,10 +251,14 @@ function buildReport({ note, photoCount, source, fromLabel, timeZone, now }) {
     `Photos attached: ${photoCount}.`,
   ].join('\n');
 
-  return {
-    subject: `Community Deficiency Report – ${when.date}`,
-    text,
-  };
+  // The time and the note keep each subject different. A stack of identical
+  // subjects from a new mailbox is what Gmail treats like a mail blast.
+  const excerpt = subjectExcerpt(shown);
+  const subject = excerpt
+    ? `Community Deficiency Report – ${when.date}, ${when.time} – ${excerpt}`
+    : `Community Deficiency Report – ${when.date}, ${when.time}`;
+
+  return { subject, text };
 }
 
 function sniffImage(buffer) {
@@ -439,6 +464,7 @@ function createMailer(config) {
         await postToAppsScript(config.appsScriptUrl, {
           secret: config.appsScriptSecret,
           to: config.recipients.join(', '),
+          fromName: config.fromName,
           subject,
           text,
           images: attachments.map((file) => ({
@@ -471,7 +497,8 @@ function createMailer(config) {
     },
     async send({ subject, text, attachments }) {
       await transporter.sendMail({
-        from: { name: 'Snitch', address: config.gmailUser },
+        from: { name: config.fromName, address: config.gmailUser },
+        replyTo: config.gmailUser,
         to: config.recipients,
         subject,
         text,
@@ -927,7 +954,7 @@ async function main() {
   console.log(`[snitch] mail mode: ${config.mailMode}`);
   console.log(`[snitch] reports go to: ${config.recipients.join(', ')}`);
   if (config.mailMode === 'smtp') {
-    console.log(`[snitch] sending as: ${config.gmailUser} via smtp.gmail.com:${config.smtpPort}`);
+    console.log(`[snitch] sending as: ${config.fromName} <${config.gmailUser}> via smtp.gmail.com:${config.smtpPort}`);
   }
   console.log(`[snitch] limits: ${config.maxPhotos} photos, ${config.maxTotalMb} MB total, ${config.dailySendMax} reports a day`);
   if (config.accessCode) console.log('[snitch] community code is on');
