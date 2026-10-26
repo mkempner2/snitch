@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#efe6d6">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121714">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Send the HOA a photo of something that needs to be fixed.">
+  <title>Snitch — Report a community issue</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <noscript>
+    <style>#code-field[hidden] { display: block !important; }</style>
+  </noscript>
+</head>
+<body>
+  <main class="wrap">
+    <header class="mast">
+      <p class="mark">Snitch</p>
+      <h1>Report it to the HOA.</h1>
+      <p class="lede">Send a photo of something that needs attention, and a note if you want. No account.</p>
+    </header>
+
+    <form id="report" class="card" action="/api/report" method="post" enctype="multipart/form-data" novalidate>
+      <p id="form-error" class="banner" role="alert" hidden></p>
+
+      <div class="field" id="code-field" hidden>
+        <label for="accessCode">Community code <span class="optional">if you have one</span></label>
+        <input id="accessCode" name="accessCode" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" inputmode="text">
+        <p class="hint">Only if your HOA gave you one. Leave it blank if not.</p>
+      </div>
+
+      <div class="field">
+        <label for="note">Note <span class="optional">optional</span></label>
+        <textarea id="note" name="note" rows="5" maxlength="4000" placeholder="Broken fence by the pool, a light out on Elm, a washout near the gate. Add your name or unit if you want a follow-up."></textarea>
+      </div>
+
+      <div class="field">
+        <span class="label" id="photos-label">Photos</span>
+        <label class="drop" id="drop" for="photos">
+          <input id="photos" name="photos" type="file" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.gif,.webp,.heic,.heif" multiple aria-labelledby="photos-label">
+          <span class="drop-title">Add photos</span>
+          <span class="drop-sub" id="drop-sub">JPG, PNG, GIF, WEBP, or HEIC. Up to 6 photos, 15 MB total.</span>
+        </label>
+        <ul class="previews" id="previews"></ul>
+        <p class="hint" id="photo-meta" aria-live="polite"></p>
+      </div>
+
+      <div class="hp" aria-hidden="true">
+        <label for="snitch_hp">Leave this blank</label>
+        <input id="snitch_hp" name="snitch_hp" type="text" tabindex="-1" autocomplete="off">
+      </div>
+
+      <button class="send" id="send" type="submit">
+        <span class="send-label">Send to the HOA</span>
+      </button>
+      <p class="fine" id="sending-hint" hidden>Sending can take a minute if the site was asleep. Stay on this page.</p>
+      <p class="fine">Photos are emailed and are not saved on this site. The HOA gets a short cover note plus your text and pictures.</p>
+    </form>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

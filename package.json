@@ -1,0 +1,20 @@
+{
+  "name": "snitch",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Email HOA deficiency reports — one or more photos and an optional note — from a phone-friendly page.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "multer": "^2.5.0",
+    "nodemailer": "^10.2.1"
+  }
+}
