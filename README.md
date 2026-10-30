@@ -52,7 +52,7 @@ Edit `.env` and set the four values in the next section. Then:
 npm start
 ```
 
-Open http://localhost:3000 . After a successful send, the browser goes to a confirmation page.
+Open http://localhost:8000 . After a successful send, the browser goes to a confirmation page.
 
 `npm test` runs the built-in checks (image types, the email text, and the form). Those checks do not send a real email.
 
@@ -82,7 +82,7 @@ Copy `.env.example` to `.env`. Never commit `.env`. It is listed in `.gitignore`
 | `GMAIL_USER` | SMTP mode | Gmail address that sends the reports |
 | `GMAIL_APP_PASSWORD` | SMTP mode | 16-character app password, not the normal password |
 | `HOA_EMAIL` | Always | Who receives reports. Separate extra addresses with commas (up to 10). |
-| `PORT` | No | Defaults to 3000. Render and Koyeb set this themselves. |
+| `PORT` | No | Defaults to 8000. Render and Koyeb set this themselves. |
 | `REPORT_TIMEZONE` | No | IANA name, such as `America/Chicago`. Defaults to `UTC`. |
 | `SMTP_PORT` | No | `587` (default, STARTTLS) or `465` |
 | `TRUST_PROXY` | On a host | Set to `1` so rate limits use the visitor's address. Render sets this on its own. |

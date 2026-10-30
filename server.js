@@ -113,7 +113,7 @@ function loadConfig() {
     timeZone = 'UTC';
   }
 
-  const port = readInteger('PORT', 3000, 1, 65535, errors);
+  const port = readInteger('PORT', 8000, 1, 65535, errors);
   const maxPhotos = readInteger('MAX_PHOTOS', 6, 1, 10, errors);
   // 15 MB of photos becomes about 20 MB after base64, under Gmail's 25 MB cap.
   const maxTotalMb = readInteger('MAX_TOTAL_MB', 15, 1, 18, errors);
