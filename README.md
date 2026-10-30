@@ -37,22 +37,41 @@ The web form requires at least one photo. A deficiency report the HOA can act on
 
 ## Run it locally
 
-Install [Node.js 18 or newer](https://nodejs.org/) (the current LTS is fine). In this folder:
+The app and the Cloudflare tunnel both run in WSL Alpine. One command starts them.
 
-```powershell
+Install the packages once in Alpine. Node.js 18 or newer is required. Alpine's `nodejs` package is the current LTS.
+
+```sh
+apk add nodejs npm curl
+```
+
+`cloudflared` is not in the Alpine package repos. If `cloudflared -v` does not print a version:
+
+```sh
+curl -fsSL -o /usr/bin/cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+chmod +x /usr/bin/cloudflared
+```
+
+In this folder:
+
+```sh
 npm install
-copy .env.example .env
+cp .env.example .env
 ```
 
-On macOS or Linux, use `cp .env.example .env` instead of `copy`.
+Edit `.env` and set the four values in the next section. Also set `TUNNEL_ID` and `TUNNEL_TOKEN`. Then, from an Alpine shell:
 
-Edit `.env` and set the four values in the next section. Then:
-
-```powershell
-npm start
+```sh
+npm run serve
 ```
 
-Open http://localhost:8000 . After a successful send, the browser goes to a confirmation page.
+That starts Snitch and the named Cloudflare tunnel from `.env`. In the Cloudflare dashboard, set that tunnel's public hostname service to `http://127.0.0.1:8000` (use the port in `PORT` if you changed it). The hostname stays the same across runs. Ctrl-C stops the app and the tunnel together.
+
+The site is also at http://localhost:8000 inside Alpine. After a successful send, the browser goes to a confirmation page.
+
+`npm start` starts the app by itself. Koyeb and Render use that command. See Deploy below.
+
+`npm run serve` sets `TRUST_PROXY=1` when neither the shell nor `.env` already sets it, so rate limits use the visitor address Cloudflare sends.
 
 `npm test` runs the built-in checks (image types, the email text, and the form). Those checks do not send a real email.
 
@@ -86,6 +105,8 @@ Copy `.env.example` to `.env`. Never commit `.env`. It is listed in `.gitignore`
 | `REPORT_TIMEZONE` | No | IANA name, such as `America/Chicago`. Defaults to `UTC`. |
 | `SMTP_PORT` | No | `587` (default, STARTTLS) or `465` |
 | `TRUST_PROXY` | On a host | Set to `1` so rate limits use the visitor's address. Render sets this on its own. |
+| `TUNNEL_ID` | `npm run serve` | UUID of the Cloudflare tunnel. |
+| `TUNNEL_TOKEN` | `npm run serve` | Long token from that tunnel's install command. Secret. The token's tunnel id must match `TUNNEL_ID`. |
 | `ACCESS_CODE` | No | If set, the form asks for this code before it will send. |
 | `INBOUND_SECRET` | No | Turns on `POST /api/inbound`. Use a long random string. |
 | `MAX_PHOTOS` | No | Default 6 |
@@ -291,6 +312,7 @@ public/success.html        Confirmation page
 public/styles.css
 public/app.js
 public/favicon.svg
+scripts/serve.sh               App and Cloudflare tunnel, one Alpine command
 scripts/apps-script-relay.gs   Optional HTTPS send path
 scripts/gmail-inbound.gs       Optional "email Snitch a photo" bridge
 .env.example
@@ -309,4 +331,6 @@ test/report.test.js
 | Photo rejected | Send JPG, PNG, GIF, WEBP, or HEIC. The file's contents have to match. |
 | `mail: false` on `/health` | Read the host logs for the mail-check line. The page still loads. |
 | First visit is very slow | The free instance was asleep. See "Keep a free instance awake". |
+| Tunnel address does not load the form | Run `npm run serve` in Alpine. That command starts the app and the tunnel together, both using Alpine's localhost. The tunnel's public hostname service must be `http://127.0.0.1:8000`. |
+| `TUNNEL_TOKEN is not a Cloudflare tunnel token` | Paste the long install token into `TUNNEL_TOKEN`. `TUNNEL_ID` is only the UUID. |
 | Everyone gets "too many reports" | Set `TRUST_PROXY=1`. Otherwise the host looks like one visitor. |
