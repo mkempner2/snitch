@@ -23,6 +23,7 @@
   var form = document.getElementById("report");
   var banner = document.getElementById("form-error");
   var note = document.getElementById("note");
+  var senderEmail = document.getElementById("senderEmail");
   var photos = document.getElementById("photos");
   var drop = document.getElementById("drop");
   var dropSub = document.getElementById("drop-sub");
@@ -198,6 +199,11 @@
       showError("The note is too long. Keep it under " + limits.noteMax + " characters.");
       return;
     }
+    var email = senderEmail ? senderEmail.value.trim() : "";
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showError("That email address doesn't look right. Leave it blank if you prefer.");
+      return;
+    }
     if (!files.length) {
       showError("Add at least one photo so the HOA can see the issue.");
       return;
@@ -212,6 +218,7 @@
 
     var data = new FormData();
     data.append("note", note.value);
+    data.append("senderEmail", email);
     data.append("accessCode", codeInput.value.trim());
     data.append("snitch_hp", hp.value);
     for (var i = 0; i < files.length; i++) data.append("photos", files[i], files[i].name);

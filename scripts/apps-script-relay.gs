@@ -80,6 +80,10 @@ function doPost(e) {
       .trim()
       .slice(0, 70);
     var options = { name: fromName || 'Community Report' };
+    var replyTo = String(data.replyTo || '').trim();
+    if (replyTo && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(replyTo)) {
+      options.replyTo = replyTo;
+    }
     if (blobs.length) options.attachments = blobs;
     GmailApp.sendEmail(allowed, String(data.subject), String(data.text), options);
     return json_({ ok: true });
