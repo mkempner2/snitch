@@ -542,12 +542,12 @@ function sendPage(res, status, { heading, message }) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
-  <title>Snitch</title>
+  <title>Eastridge Reports</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <main class="wrap">
-    <p class="mark">Snitch</p>
+    <p class="mark">Eastridge Reports</p>
     <section class="card">
       <h1>${safeHeading}</h1>
       <p class="lede">${safe}</p>

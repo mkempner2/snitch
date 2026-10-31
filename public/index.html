@@ -7,7 +7,7 @@
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121714">
   <meta name="robots" content="noindex">
   <meta name="description" content="Send the HOA a photo of something that needs to be fixed.">
-  <title>Snitch — Report a community issue</title>
+  <title>Eastridge Reports — Report a community issue</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <noscript>
@@ -17,9 +17,9 @@
 <body>
   <main class="wrap">
     <header class="mast">
-      <p class="mark">Snitch</p>
+      <p class="mark">Eastridge Reports</p>
       <h1>Report it to the HOA.</h1>
-      <p class="lede">Send a photo of something that needs attention, and a note if you want. No account.</p>
+      <p class="lede">Send a photo of something that needs attention, and a note if you want.</p>
     </header>
 
     <form id="report" class="card" action="/api/report" method="post" enctype="multipart/form-data" novalidate>
@@ -33,7 +33,7 @@
 
       <div class="field">
         <label for="note">Note <span class="optional">optional</span></label>
-        <textarea id="note" name="note" rows="5" maxlength="4000" placeholder="Broken fence by the pool, a light out on Elm, a washout near the gate. Add your name or unit if you want a follow-up."></textarea>
+        <textarea id="note" name="note" rows="5" maxlength="4000" placeholder="Trash in common area, broken fountain, or other issues. Add your personal contact information if you want a follow-up."></textarea>
       </div>
 
       <div class="field">
