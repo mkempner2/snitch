@@ -33,7 +33,7 @@ Thank you.
 
 A short footer after that records the time, how the report arrived (web form, email, or text message), and the sender when a text or email intake provides one.
 
-The web form requires at least one photo. A deficiency report the HOA can act on needs the picture, and the cover letter refers to the attachments. The note is optional. Text-message intake can send a note without a photo, because most free SMS tools cannot forward pictures. In that case the photo sentence says that no photo was attached.
+The web form requires at least one photo. A deficiency report the HOA can act on needs the picture, and the cover letter refers to the attachments. The note is optional. Residents can also optionally enter their own email address; when they do, that address is set as the Reply-To header so the HOA can reply directly to them, and it appears in the footer as the sender. Text-message intake can send a note without a photo, because most free SMS tools cannot forward pictures. In that case the photo sentence says that no photo was attached.
 
 ## Run it locally
 

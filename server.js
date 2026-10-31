@@ -460,11 +460,12 @@ function createMailer(config) {
           ping: true,
         });
       },
-      async send({ subject, text, attachments }) {
+      async send({ subject, text, attachments, replyTo }) {
         await postToAppsScript(config.appsScriptUrl, {
           secret: config.appsScriptSecret,
           to: config.recipients.join(', '),
           fromName: config.fromName,
+          replyTo: replyTo || '',
           subject,
           text,
           images: attachments.map((file) => ({
@@ -495,10 +496,10 @@ function createMailer(config) {
     async check() {
       await transporter.verify();
     },
-    async send({ subject, text, attachments }) {
+    async send({ subject, text, attachments, replyTo }) {
       await transporter.sendMail({
         from: { name: config.fromName, address: config.gmailUser },
-        replyTo: config.gmailUser,
+        replyTo: replyTo || config.gmailUser,
         to: config.recipients,
         subject,
         text,
@@ -710,7 +711,7 @@ function createApp(ctx) {
     }
   }
 
-  async function deliverReport(req, res, { note, attachments, source, fromLabel }) {
+  async function deliverReport(req, res, { note, attachments, source, fromLabel, replyTo }) {
     if (recentSends().length >= config.dailySendMax) {
       return sendError(req, res, 429, 'Snitch has sent its daily limit of reports. Please try again tomorrow.');
     }
@@ -729,6 +730,7 @@ function createApp(ctx) {
         subject: report.subject,
         text: report.text,
         attachments,
+        replyTo: replyTo || undefined,
       });
     } catch (err) {
       console.error('[snitch] send failed:', err.message);
@@ -789,11 +791,23 @@ function createApp(ctx) {
     const note = sanitizeNote(req.body.note, config.noteMax);
     if (note.error) return sendError(req, res, 400, note.error);
 
+    let replyTo = '';
+    let fromLabel = '';
+    const rawEmail = typeof req.body.senderEmail === 'string' ? req.body.senderEmail.trim() : '';
+    if (rawEmail) {
+      if (!isEmail(rawEmail) || rawEmail.length > 120) {
+        return sendError(req, res, 400, "That email address doesn't look right. Leave it blank if you prefer.");
+      }
+      replyTo = rawEmail.toLowerCase();
+      fromLabel = replyTo;
+    }
+
     await deliverReport(req, res, {
       note: note.text,
       attachments: parsed.attachments,
       source: 'web',
-      fromLabel: '',
+      fromLabel,
+      replyTo,
     });
   }));
 
